@@ -1,17 +1,18 @@
 import { Container } from 'react-bootstrap';
-import {BrowserRouter, Routes, Route} from 'react-router-dom'
+import {BrowserRouter as Router, Route, Routes} from 'react-router-dom'
 
 import HomeComponent from './components/HomeComponent';
 
 function App() {
   return (
     <Container>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element="HomeComponent" />
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route path='/' exact element={<HomeComponent/>}/>
+        
+      </Routes>
     </Container>
+ 
+    
   );
 }
 
