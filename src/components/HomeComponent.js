@@ -7,7 +7,16 @@ import parse from "html-react-parser";
 import {useDispatch, useSelector} from 'react-redux'
 import { GetFactionsAction } from '../acions/FactionsAction';
 import { GetUnitsAction } from '../acions/UnitAction';
-import { addPickedUnitAction } from '../acions/PickedUnitsAction';
+import { 
+  resetPickedUnitAction, 
+  addPickedUnitAction, 
+  pickUnitAction, 
+  selectUnitWeaponAction, 
+  addUnitWeaponAction, 
+  selectUnitWargearAction,
+  addUnitWargearAction
+ } from '../acions/PickedUnitsAction';
+ import { calculatePointsAction } from '../acions/PointsAction'
 
 
 function HomeComponent() {
@@ -15,94 +24,35 @@ function HomeComponent() {
   const factions = useSelector(state => state.FactionsReducer);
   const units = useSelector(state => state.UnitsReducer);
   const selectedUnits = useSelector(state => state.PickedUnitsReducer)
+  const points = useSelector(state => state.PointsReducer)
 
-  const [usedPoints, setUsedPoints] = useState(0);
   const [faction, setFaction] = useState(0);
-  const [pickedUnits, setPickedUnits] = useState(selectedUnits);
 
   useEffect(() => {
     dispatch(GetFactionsAction())
-  },[dispatch]) 
-
-  // useEffect(() => {
-  //   calculatePoints()
-  // }, [pickedUnits])
-
-  // const calculatePoints = () =>{
-  //   let points = 0;
-  //   for(const unit of pickedUnits){
-  //     points = points + unit.price;
-  //     if(!!unit.weapon_options){
-  //       for(const weapon of unit.weapon_options){
-  //         if(!!weapon.price){
-  //           points = points + weapon.price
-  //         }
-  //       }
-  //     }
-  //     if(!!unit.armourys){
-  //       for(const wargear of unit.armourys){
-  //         if(!!wargear.price){
-  //           points = points + wargear.price
-  //         }
-  //       }
-  //     }
-  //   }
-  //   setUsedPoints(points);
-  // }
+  },[dispatch])
+  
+  useEffect(() => {
+    dispatch(calculatePointsAction(selectedUnits))
+  }, [selectedUnits])
 
   const handleFaction = (faction_id) =>{
     setFaction(faction_id);
     if(faction.length  !== 0){
-      setPickedUnits([]);
       dispatch(GetUnitsAction(faction_id));
-      dispatch(addPickedUnitAction(selectedUnits))
+      dispatch(resetPickedUnitAction(selectedUnits))
     }
   }
 
-  const changeUnit = (index, unitName) => {
-    const currentUnit = units.find(u => u.name === unitName);
-    const currentUnits = [...pickedUnits];
-    const currentPick = {
-                         id: index, name: currentUnit.name, weapon_skill: currentUnit.weapon_skill, balistics_skill: currentUnit.balistics_skill, strength: currentUnit.strength, 
-                         toughness: currentUnit.toughness, wounds: currentUnit.wounds, initiative: currentUnit.initiative, attacks: currentUnit.attacks , leadership: 
-                         currentUnit.leadership, armor_save: currentUnit.armor_save, unit_type: currentUnit.unit_type, price: currentUnit.price, options: 
-                         currentUnit.options, special_rules: currentUnit.special_rules, weapon_options: [{}], armourys: [{}]
-                        };
-    currentUnits[index] = currentPick;
-    setPickedUnits(currentUnits);
-  }
-
-  const addUnit = () => dispatch(addPickedUnitAction(selectedUnits));
-
   const weapons = (unitName) => units.find(u => u.name === unitName).weapon_options;
-  
-  const selectWeapon = (weaponName, unitName, unitId, index) => {
-    const weapon = units.find(u => u.name === unitName).weapon_options.find(w => w.name === weaponName);
-    const currentUnits = [...pickedUnits];
-    currentUnits.find(u => u.id === unitId).weapon_options[index] = {name: weapon.name, range: weapon.range, strength: weapon.strength, armor_penetration: weapon.armor_penetration, weapon_type: weapon.weapon_type, price: weapon.price};
-    setPickedUnits(currentUnits);
-  }
 
-  const addWeapon = (index) => {
-    const currentUnits = [...pickedUnits];
-    currentUnits[index].weapon_options = [...currentUnits[index].weapon_options, {}];
-    setPickedUnits(currentUnits);
-  }
+  const addWeapon = (index) => dispatch(addUnitWeaponAction(index, selectedUnits))
 
   const warGear = (unitName) => units.find(u => u.name === unitName).armourys;
 
-  const selectWargear = (wargearName, unitName, unitId, index) => {
-    const wargear = units.find(u => u.name === unitName).armourys.find(w => w.name === wargearName);
-    const currentUnits = [...pickedUnits];
-    currentUnits.find(u => u.id === unitId).armourys[index] = {name: wargear.name, description: wargear.description, price: wargear.price};
-    setPickedUnits(currentUnits);
-  }
-
-  const addWargear= (index) => {
-    const currentUnits = [...pickedUnits];
-    currentUnits[index].armourys = [...currentUnits[index].armourys, {}];
-    setPickedUnits(currentUnits);
-  }
+  const selectWargear = (wargearName, unitName, unitId, index) => dispatch(selectUnitWargearAction(wargearName, unitName, unitId, index, units, selectedUnits))
+  
+  const addWargear= (index) => dispatch(addUnitWargearAction(index, selectedUnits))
 
 
   return (
@@ -111,7 +61,7 @@ function HomeComponent() {
       <Card>
         <Card.Body>
           <h2>Create killteam</h2>
-            {`${usedPoints} points`}            
+            {`${points} points`}            
           <br />
           <h4>Select Faction</h4>
           <Form.Select onChange={e => handleFaction(e.target.value)}>
@@ -119,12 +69,12 @@ function HomeComponent() {
             {factions.map((faction, index) => <option key={index} value={faction.id}>{faction.name}</option>)}
           </Form.Select>
           <br />
-          {pickedUnits.map((unit, index) => {
+          {selectedUnits.map((unit, index) => {
             return(
               <Card key={index}>
                 <Card.Body>
                   <h5>Unit name</h5>
-                  <Form.Select onChange={e => changeUnit(index, e.target.value)}>
+                  <Form.Select onChange={e => dispatch(pickUnitAction(index, e.target.value, units, selectedUnits))}>
                     <option value="">Select Unit</option>
                     {units.length !== 0 && units.map((unit, index) => <option key={index} value={unit.name}>{`${unit.name} (${unit.price} points)`}</option>)}
                   </Form.Select>
@@ -196,7 +146,7 @@ function HomeComponent() {
                             {unit.weapon_options.map((weapon_option, index) => {
                               return (
                                 <div key={index}>
-                                  <Form.Select onChange={e => selectWeapon(e.target.value, unit.name, unit.id, index)}>
+                                  <Form.Select onChange={e => dispatch(selectUnitWeaponAction(e.target.value, unit.name, unit.id, index, units, selectedUnits))}>
                                     <option value="">Select Weapon</option>
                                     {weapons(unit.name).map((weapon, index) => <option key={index} value={weapon.name}>{`${weapon.name} (${weapon.price} Points)`}</option>)}
                                   </Form.Select>
@@ -228,14 +178,14 @@ function HomeComponent() {
                               
                             })}
                             <br />
-                            <Button onClick={e => addWeapon(index)}>Add Weapon</Button>
+                            <Button onClick={e => dispatch(addUnitWeaponAction(index, selectedUnits))}>Add Weapon</Button>
                         </Col>
                         <Col>
                           <h5>Wargear options</h5>
                           {unit.armourys.map((wargear, index) => {
                             return (
                               <div key={index}>
-                                <Form.Select onChange={e => selectWargear(e.target.value, unit.name, unit.id, index)}>
+                                <Form.Select onChange={e => dispatch(selectUnitWargearAction(e.target.value, unit.name, unit.id, index, units, selectedUnits))}>
                                   <option value="">Select wargear</option>
                                   {warGear(unit.name).map((wargear, index) => <option key={index} value={wargear.name}>{`${wargear.name} (${wargear.price} points)`}</option>)}
                                 </Form.Select>
@@ -257,9 +207,9 @@ function HomeComponent() {
             )
           })}
           <br />
-          {`${usedPoints} points`}            
+          {`${points} points`}            
           <br/>
-          <Button onClick={e => addUnit()}>Add Unit</Button>
+          <Button onClick={e => dispatch(addPickedUnitAction(selectedUnits))}>Add Unit</Button>
         </Card.Body>
       </Card>
     </div>
