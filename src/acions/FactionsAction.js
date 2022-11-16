@@ -5,7 +5,7 @@ export const GetFactionsAction = () =>{
 		})
 
 		dispatch({
-			type: 'FactionsAction',
+			type: 'GetFactionsAction',
 			payload: await factions.json()
 		})
 	}
