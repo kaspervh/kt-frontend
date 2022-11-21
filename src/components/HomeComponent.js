@@ -46,14 +46,7 @@ function HomeComponent() {
 
   const weapons = (unitName) => units.find(u => u.name === unitName).weapon_options;
 
-  const addWeapon = (index) => dispatch(addUnitWeaponAction(index, selectedUnits))
-
   const warGear = (unitName) => units.find(u => u.name === unitName).armourys;
-
-  const selectWargear = (wargearName, unitName, unitId, index) => dispatch(selectUnitWargearAction(wargearName, unitName, unitId, index, units, selectedUnits))
-  
-  const addWargear= (index) => dispatch(addUnitWargearAction(index, selectedUnits))
-
 
   return (
     <div>
@@ -195,7 +188,7 @@ function HomeComponent() {
                             )
                           })}
                           <br />
-                          <Button onClick={e => addWargear(index)}>Add wargear</Button>
+                          <Button onClick={e => dispatch(addUnitWargearAction(index, selectedUnits))}>Add wargear</Button>
                         </Col>
                       </Row>
                       

@@ -8,7 +8,7 @@ function NavbarComponent() {
         <Navbar.Brand href="/">Killteam-Builder</Navbar.Brand>
         <Nav></Nav>
         <Nav>
-        <Nav.Link href="/login">Sign up</Nav.Link>
+        <Nav.Link href="/signup">Sign up</Nav.Link>
             <Nav.Link href="/login">Log in</Nav.Link>
         </Nav>
         </Container>
