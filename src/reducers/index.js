@@ -5,6 +5,7 @@ import PickedUnitsReducer from './PickedUnitsReducer';
 import PointsReducer from './PointsReducer';
 import SessionReducer from './SessionReducer';
 import UserRducer from './UserReducer';
+import RostersReducer from './RostersReducer';
 
 const allReducers = combineReducers({
    FactionsReducer,
@@ -12,7 +13,8 @@ const allReducers = combineReducers({
    PickedUnitsReducer,
    PointsReducer,
    SessionReducer,
-   UserRducer
+   UserRducer,
+   RostersReducer
 });
 
 export default allReducers

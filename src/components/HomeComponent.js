@@ -7,6 +7,7 @@ import parse from "html-react-parser";
 import {useDispatch, useSelector} from 'react-redux'
 import { GetFactionsAction } from '../acions/FactionsAction';
 import { GetUnitsAction } from '../acions/UnitAction';
+import {saveRosterAction} from '../acions/RostersAction';
 import { 
   resetPickedUnitAction, 
   addPickedUnitAction, 
@@ -14,19 +15,21 @@ import {
   selectUnitWeaponAction, 
   addUnitWeaponAction, 
   selectUnitWargearAction,
-  addUnitWargearAction
+  addUnitWargearAction,
  } from '../acions/PickedUnitsAction';
  import { calculatePointsAction } from '../acions/PointsAction'
 
 
 function HomeComponent() {
   const dispatch = useDispatch();
+  const user = useSelector(state => state.SessionReducer);
   const factions = useSelector(state => state.FactionsReducer);
   const units = useSelector(state => state.UnitsReducer);
   const selectedUnits = useSelector(state => state.PickedUnitsReducer)
   const points = useSelector(state => state.PointsReducer)
 
   const [faction, setFaction] = useState(0);
+  const [rosterName, setRosterName] = useState('');
 
   useEffect(() => {
     dispatch(GetFactionsAction())
@@ -56,6 +59,13 @@ function HomeComponent() {
           <h2>Create killteam</h2>
             {`${points} points`}            
           <br />
+          {(!!user && !!user.token)  && 
+            <div>
+              <h4>Roster Name</h4>
+              <Form.Control onChange={e => setRosterName(e.target.value)} placholder='Brotherhood Of the damned'></Form.Control> 
+              <br/>
+            </div>
+          }
           <h4>Select Faction</h4>
           <Form.Select onChange={e => handleFaction(e.target.value)}>
             <option value="">Select faction</option>
@@ -203,6 +213,7 @@ function HomeComponent() {
           {`${points} points`}            
           <br/>
           <Button onClick={e => dispatch(addPickedUnitAction(selectedUnits))}>Add Unit</Button>
+          {(!!user && !!user.token) && <Button onClick={e => dispatch(saveRosterAction(user.token, rosterName, selectedUnits))} className='float-end' variant='success'>Save Roster</Button>}
         </Card.Body>
       </Card>
     </div>

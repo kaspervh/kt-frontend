@@ -15,7 +15,7 @@ function LoginComponent() {
 
   useEffect(() => {
     console.log(user)
-    if(!!user.token){
+    if(!!user && !!user.token){
       navigate('/')
     }else{
       setError('Login failed ')

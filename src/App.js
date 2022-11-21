@@ -6,6 +6,8 @@ import NavbarComponent from './components/widgets/NavbarComponent';
 import HomeComponent from './components/HomeComponent';
 import LoginComponent from './components/LoginComponent';
 import SignupComponent from './components/SignupComponent';
+import RostersComponent from './components/rosters/RostersComponent';
+import ShowRosterComponent from './components/rosters/ShowRosterComponent';
 
 function App() {
   return (
@@ -15,7 +17,9 @@ function App() {
         <Routes>
           <Route path='/' exact element={<HomeComponent/>}/>
           <Route path='/login' exact element={<LoginComponent/>} />
-          <Route path='/Signup' exact element={<SignupComponent/>} />
+          <Route path='/signup' exact element={<SignupComponent/>} />
+          <Route path='/rosters/index' exact element={<RostersComponent/>}/>
+          <Route path='/rosters/show/:index' exact element={<ShowRosterComponent/>}/>
         </Routes>
       </Container>
     </div>
